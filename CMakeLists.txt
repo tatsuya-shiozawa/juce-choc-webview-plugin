@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 
-project(juce-choc-fmt)
+project(juce-choc-webview-plugin)
 
 #This is temporarily needed due to a bug in Xcode 15:
 if (CMAKE_CXX_COMPILER_ID MATCHES "AppleClang")
@@ -45,13 +45,8 @@ find_package(choc REQUIRED)
 
 find_package(fmt REQUIRED)
 
-#By default, we are building the provided plugin/app examples:
-option(BUILD_JUCE_PROTOTYPE_EXAMPLES "Build JUCE prototype examples" ON)
-
-if (${BUILD_JUCE_PROTOTYPE_EXAMPLES})
-    #adding project folders:
-    add_subdirectory(Plugins)
-endif ()
+#Add plugins projects
+add_subdirectory(Plugins)
 
 #optionally, we're also adding the unit tests:
 option(BUILD_UNIT_TESTS "Build JUCE prototype examples" ON)
