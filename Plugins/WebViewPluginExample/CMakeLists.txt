@@ -1,6 +1,6 @@
-project(NewPluginTemplate VERSION 0.0.1)
+project(WebViewPluginExample VERSION 0.0.1)
 
-set (BaseTargetName NewPluginTemplate)
+set (BaseTargetName WebViewPluginExample)
 
 juce_add_plugin("${BaseTargetName}"
         # VERSION ...                               # Set this if the plugin version is different to the project version
@@ -17,6 +17,11 @@ juce_add_plugin("${BaseTargetName}"
         PLUGIN_CODE NPtm
         FORMATS AU VST3 Standalone
         PRODUCT_NAME "Audio Plugin Example")
+
+juce_add_binary_data(WebViewBundleData
+        HEADER_NAME "WebViewBundleData.h"
+        NAMESPACE "WebView"
+        SOURCES WebView/view.html)
 
 target_sources(${BaseTargetName} PRIVATE
         Source/PluginProcessor.cpp
@@ -48,4 +53,5 @@ target_link_libraries(${BaseTargetName}
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags
         fmt::fmt
+        WebViewBundleData
 )

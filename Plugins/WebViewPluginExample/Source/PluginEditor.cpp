@@ -1,5 +1,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "WebViewBundleData.h"
 
 //==============================================================================
 AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAudioProcessor& p)
@@ -18,7 +19,26 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     setSize (400, 300);
     setResizable(true, true);
 
-    chocWebView->navigate("http://www.google.com");
+    //chocWebView->navigate("http://www.google.com");
+
+    auto web_view_function_hello_cpp =
+      [safe_this = juce::Component::SafePointer(this)](const choc::value::ValueView& args) -> choc::value::Value {
+      if (safe_this.getComponent() == nullptr)
+      {
+        return choc::value::Value(-1);
+      }
+
+      juce::AlertWindow::showMessageBoxAsync(
+        juce::MessageBoxIconType::WarningIcon,
+        "Hello from WebView!!!", "This dialog triggered by web view!!!");
+
+      return choc::value::Value(0);
+    };
+
+    chocWebView->bind("hello_cpp", web_view_function_hello_cpp);
+
+    const auto html = juce::String::createStringFromData(WebView::view_html, WebView::view_htmlSize);
+    chocWebView->setHTML(html.toStdString());
 }
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
