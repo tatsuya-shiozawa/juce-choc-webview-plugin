@@ -43,6 +43,8 @@ find_package(juce REQUIRED)
 
 find_package(choc REQUIRED)
 
+find_package(clap-juce-extensions REQUIRED)
+
 find_package(fmt REQUIRED)
 
 #Add plugins projects

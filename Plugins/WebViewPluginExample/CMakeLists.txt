@@ -1,5 +1,9 @@
 project(WebViewPluginExample VERSION 0.0.1)
 
+message(${choc_SOURCE_DIR})
+message(${fmt_SOURCE_DIR})
+message(${clap-juce-extensions_SOURCE_DIR})
+
 set (BaseTargetName WebViewPluginExample)
 
 juce_add_plugin("${BaseTargetName}"
@@ -16,7 +20,11 @@ juce_add_plugin("${BaseTargetName}"
         PLUGIN_MANUFACTURER_CODE Juce
         PLUGIN_CODE NPtm
         FORMATS AU VST3 Standalone
-        PRODUCT_NAME "Audio Plugin Example")
+        PRODUCT_NAME "WebViewPluginExample")
+
+clap_juce_extensions_plugin(TARGET "${BaseTargetName}"
+        CLAP_ID "com.my-cool-plugs.my-target"
+        CLAP_FEATURES audio-effect filter mono stereo)
 
 juce_add_binary_data(WebViewBundleData
         HEADER_NAME "WebViewBundleData.h"
@@ -42,8 +50,10 @@ target_compile_definitions(${BaseTargetName}
         JUCE_USE_CURL=0
         JUCE_VST3_CAN_REPLACE_VST2=0)
 
-message(${choc_SOURCE_DIR})
-message(${fmt_SOURCE_DIR})
+# Use PUBLIC to effect linked target like VST3, Standalone, CLAP, ...
+target_compile_features(${BaseTargetName}
+    PUBLIC
+        cxx_std_17)
 
 target_include_directories(${BaseTargetName} PUBLIC
         ${choc_SOURCE_DIR}
