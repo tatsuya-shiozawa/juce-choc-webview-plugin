@@ -64,7 +64,9 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     chocWebView->bind("onClickButton", web_view_on_click_button);
     chocWebView->bind("onSliderChanged", web_view_on_sliider_changed);
 
-    const auto html = juce::String::createStringFromData(WebView::view_hello_html, WebView::view_hello_htmlSize);
+    //const auto html = juce::String::createStringFromData(WebView::view_hello_html, WebView::view_hello_htmlSize);
+    //const auto html = juce::String::createStringFromData(WebView::view_threejs_html, WebView::view_threejs_htmlSize);
+    const auto html = juce::String::createStringFromData(WebView::view_keyboard_threejs_html, WebView::view_keyboard_threejs_htmlSize);
     chocWebView->setHTML(html.toStdString());
 }
 

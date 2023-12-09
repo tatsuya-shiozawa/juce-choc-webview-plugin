@@ -26,6 +26,7 @@ juce_add_binary_data(WebViewBundleData
                 WebView/view_webgl.html
                 WebView/view_threejs.html
                 WebView/view_vrm.html
+                WebView/view_keyboard_threejs.html
         )
 
 target_sources(${BaseTargetName} PRIVATE

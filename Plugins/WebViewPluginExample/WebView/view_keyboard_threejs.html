@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Piano Keyboard with Three.js</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.138.0/build/three.min.js"></script>
+    <script>
+        // Constants for piano keyboard
+        const whiteKeyWidth = 20;
+        const whiteKeyHeight = 120;
+        const whiteKeyDepth = 10;
+        const blackKeyWidth = 15;
+        const blackKeyHeight = 80;
+        const blackKeyDepth = 10;
+        const gapBetweenKeys = 2;
+
+        // Three.js variables
+        let scene, camera, renderer;
+        let raycaster, mouse;
+        let clickedKey = null;
+
+        // Piano keys
+        let pianoKeys = [];
+
+        // Initialization function
+        function init() {
+            // Create a scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xf0f0f0);
+
+            // Create a camera
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+            camera.position.set(0, 150, 200);
+            camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+            // Add ambient light for overall illumination
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            scene.add(ambientLight);
+
+            // Add directional light
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.7);
+            directionalLight.position.set(0, 1, 0);
+            scene.add(directionalLight);
+
+            // Create a renderer
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            // Create raycaster and mouse vector
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
+
+            // Create piano keys
+            createPianoKeys();
+
+            // Event listeners for mouse events
+            document.addEventListener('mousedown', onMouseDown);
+            document.addEventListener('mouseup', onMouseUp);
+            document.addEventListener('mousemove', onMouseMove);
+
+            // Animation loop
+            animate();
+        }
+
+        // Create piano keys
+        function createPianoKeys() {
+            // White keys
+            for (let i = 0; i < 14; i++) {
+                const whiteKey = createKey(whiteKeyWidth, whiteKeyHeight, whiteKeyDepth, 0xffffff);
+                whiteKey.position.x = i * (whiteKeyWidth + gapBetweenKeys) - (whiteKeyWidth + gapBetweenKeys) * 7;
+                scene.add(whiteKey);
+                pianoKeys.push(whiteKey);
+            }
+
+            // Black keys
+            const blackKeyIndices = [1, 3, 6, 8, 10];
+            for (let i of blackKeyIndices) {
+                const blackKey = createKey(blackKeyWidth, blackKeyHeight, blackKeyDepth, 0x000000);
+                blackKey.position.x = (i + 0.5) * (whiteKeyWidth + gapBetweenKeys) - (whiteKeyWidth + gapBetweenKeys) * 7;
+                blackKey.position.y = blackKeyHeight / 2;
+                scene.add(blackKey);
+                pianoKeys.push(blackKey);
+            }
+        }
+
+        // Create a single piano key
+        function createKey(width, height, depth, color) {
+            const geometry = new THREE.BoxGeometry(width, height, depth);
+            const material = new THREE.MeshPhongMaterial({
+                color: color,
+                shininess: 50,
+                specular: 0x111111,
+                emissive: 0x000000,
+                side: THREE.DoubleSide
+            }); // Phong material for lighting
+            return new THREE.Mesh(geometry, material);
+        }
+
+        // Handle mouse down
+        function onMouseDown(event) {
+            event.preventDefault();
+
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+
+            const intersects = raycaster.intersectObjects(pianoKeys);
+
+            if (intersects.length > 0) {
+                clickedKey = intersects[0].object;
+                clickedKey.rotation.x += Math.PI / 8; // Rotate the clicked key
+            }
+        }
+
+        // Handle mouse up
+        function onMouseUp(event) {
+            event.preventDefault();
+
+            if (clickedKey) {
+                clickedKey.rotation.x = 0; // Reset rotation
+                clickedKey = null;
+            }
+        }
+
+        // Handle mouse move
+        function onMouseMove(event) {
+            event.preventDefault();
+
+            if (clickedKey) {
+                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+                raycaster.setFromCamera(mouse, camera);
+            }
+        }
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            renderer.render(scene, camera);
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', function () {
+            const newWidth = window.innerWidth;
+            const newHeight = window.innerHeight;
+
+            camera.aspect = newWidth / newHeight;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize(newWidth, newHeight);
+        });
+
+        // Initialize the piano
+        init();
+    </script>
+</body>
+</html>
