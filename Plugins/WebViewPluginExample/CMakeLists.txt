@@ -36,6 +36,7 @@ juce_add_binary_data(WebViewBundleData
                 WebView/view_vrm.html
                 WebView/view_keyboard_threejs.html
                 WebView/view_babylonjs.html
+                WebView/view_webgpu.html
         )
 
 target_sources(${BaseTargetName} PRIVATE

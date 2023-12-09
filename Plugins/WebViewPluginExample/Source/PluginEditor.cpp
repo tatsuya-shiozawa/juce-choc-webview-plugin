@@ -2,6 +2,19 @@
 #include "PluginEditor.h"
 #include "WebViewBundleData.h"
 
+std::string getMimeType(std::string const& ext) {
+  static std::unordered_map<std::string, std::string> mimeTypes{
+      { ".html",   "text/html" },
+      { ".js",     "application/javascript" },
+      { ".css",    "text/css" },
+  };
+
+  if (mimeTypes.count(ext) > 0)
+    return mimeTypes.at(ext);
+
+  return "application/octet-stream";
+}
+
 //==============================================================================
 AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAudioProcessor& p)
     : AudioProcessorEditor (&p), processorRef (p)
@@ -10,6 +23,24 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
 
     choc::ui::WebView::Options options;
     options.enableDebugMode = true;
+
+    auto asset_directory = juce::File("/path/to/asset/directory");
+    
+    options.fetchResource = [this, assetDirectory = asset_directory](const choc::ui::WebView::Options::Path& path)
+    -> std::optional<choc::ui::WebView::Options::Resource> {
+      auto relative_path = "." + (path == "/" ? "/index.html" : path);
+      auto file_to_read = assetDirectory.getChildFile(relative_path);
+      juce::MemoryBlock memory_block;
+
+      if (!file_to_read.existsAsFile() || !file_to_read.loadFileAsData(memory_block))
+        return {};
+
+      return choc::ui::WebView::Options::Resource {
+          std::vector<uint8_t>(memory_block.begin(), memory_block.end()),
+          getMimeType(file_to_read.getFileExtension().toStdString())
+      };
+    };
+
     chocWebView = std::make_unique<choc::ui::WebView>(options);
     
     juceHwndView = std::make_unique<juce::HWNDComponent>();
@@ -64,10 +95,11 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     chocWebView->bind("onClickButton", web_view_on_click_button);
     chocWebView->bind("onSliderChanged", web_view_on_sliider_changed);
 
-    //const auto html = juce::String::createStringFromData(WebView::view_hello_html, WebView::view_hello_htmlSize);
-    const auto html = juce::String::createStringFromData(WebView::view_threejs_html, WebView::view_threejs_htmlSize);
+    const auto html = juce::String::createStringFromData(WebView::view_hello_html, WebView::view_hello_htmlSize);
+    /*const auto html = juce::String::createStringFromData(WebView::view_threejs_html, WebView::view_threejs_htmlSize);*/
     //const auto html = juce::String::createStringFromData(WebView::view_keyboard_threejs_html, WebView::view_keyboard_threejs_htmlSize);
     //const auto html = juce::String::createStringFromData(WebView::view_babylonjs_html, WebView::view_babylonjs_htmlSize);
+    //const auto html = juce::String::createStringFromData(WebView::view_webgpu_html, WebView::view_webgpu_htmlSize);
     chocWebView->setHTML(html.toStdString());
 }
 
