@@ -125,8 +125,13 @@ void AudioPluginAudioProcessorEditor::resized()
 
   juceHwndView->setBounds(getLocalBounds());
 
-  juce::MessageManager::callAsync([safe_this = juce::Component::SafePointer(this)]() {
-    
+  juce::MessageManager::callAsync(
+    [safe_this = juce::Component::SafePointer(this)]() {
+    if (safe_this.getComponent() == nullptr)
+    {
+      return;
+    }
+
     {
       safe_this->chocWebView->evaluateJavascript("Hello()");
     }
