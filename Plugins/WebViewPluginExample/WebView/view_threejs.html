@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js Mouse Pong</title>
+    <style>
+        body { margin: 0; }
+    </style>
+    <!-- Three.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <script>
+        // Three.js variables
+        var scene, camera, renderer;
+        var player, ball;
+
+        // Mouse variables
+        var mouseX = 0;
+
+        // Initialization function
+        function init() {
+            // Create a scene
+            scene = new THREE.Scene();
+
+            // Create a camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+
+            // Create a renderer
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            // Create player
+            var geometry = new THREE.BoxGeometry(1, 0.2, 0.2);
+            var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            player = new THREE.Mesh(geometry, material);
+            scene.add(player);
+
+            // Create ball
+            geometry = new THREE.SphereGeometry(0.1, 32, 32);
+            material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+            ball = new THREE.Mesh(geometry, material);
+            scene.add(ball);
+
+            // Event listener for mouse movement
+            document.addEventListener('mousemove', onMouseMove);
+
+            // Animation loop
+            animate();
+        }
+
+        // Handle mouse movement
+        function onMouseMove(event) {
+            // Convert mouse position to a normalized value (-1 to 1)
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+        }
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Update player position based on mouse movement
+            player.position.x = mouseX * 5;
+
+            // Update ball position
+            ball.position.y += 0.05;
+
+            // Check for collision with player
+            if (ball.position.y < player.position.y + 0.2 &&
+                ball.position.y > player.position.y - 0.2 &&
+                Math.abs(ball.position.x - player.position.x) < 0.6) {
+                // Reverse ball direction on collision with player
+                ball.position.y += 0.1;
+            }
+
+            // Check for collision with walls
+            if (ball.position.y > 2 || ball.position.y < -2) {
+                // Reverse ball direction on collision with walls
+                ball.position.y *= -1;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', function () {
+            var newWidth = window.innerWidth;
+            var newHeight = window.innerHeight;
+
+            camera.aspect = newWidth / newHeight;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize(newWidth, newHeight);
+        });
+
+        // Initialize the game
+        init();
+    </script>
+</body>
+</html>

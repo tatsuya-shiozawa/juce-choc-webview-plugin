@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Three.js VRM Loader</title>
+  <script type="module" src="https://threejs.org/build/three.module.js"></script>
+</head>
+<body>
+  <script type="module">
+
+    import * as THREE from 'https://threejs.org/build/three.module.js';
+    import { VRMLoader } from 'https://threejs.org/examples/jsm/loaders/VRMLoader.js';
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const vrmLoader = new VRMLoader();
+
+    // VRM ファイルのパスを指定してください
+    const vrmPath = 'path/to/your/model.vrm';
+
+    vrmLoader.load(vrmPath, (vrm) => {
+      scene.add(vrm.scene);
+    });
+
+    camera.position.z = 5;
+
+    const animate = () => {
+      requestAnimationFrame(animate);
+
+      // アニメーションやカメラの制御などを追加できます
+
+      renderer.render(scene, camera);
+    };
+
+    animate();
+
+  </script>
+</body>
+</html>

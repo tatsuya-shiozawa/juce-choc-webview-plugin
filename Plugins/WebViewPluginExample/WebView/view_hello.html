@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple GUI</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 20px;
+    }
+
+    #output {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Simple GUI</h1>
+
+  <button id="myButton_simple">Send simple messge!</button>
+  <button id="myButton_json">Send json object!</button>
+
+  <p>Slider Value: <span id="sliderValue">50</span></p>
+  <input type="range" min="0" max="100" value="50" id="mySlider">
+
+  <div id="output"></div>
+
+  <script>
+    // JavaScript code for handling button and slider events
+    document.getElementById('myButton_simple').addEventListener('click', function() {
+      document.getElementById('output').innerText = 'Button Clicked!';
+      onClickButton("Button Clicked!");
+    });
+
+    // JavaScript code for handling button and slider events
+    document.getElementById('myButton_json').addEventListener('click', function() {
+        const jsonData = {
+          message: 'Button Clicked!',
+          sliderValue: parseInt(document.getElementById('sliderValue').innerText),
+          someArray: [1, 2, 3, 4, 5]
+        };
+  
+        // Convert JSON data to a string for display
+        const jsonString = JSON.stringify(jsonData, null, 2);
+        
+        document.getElementById('output').innerText = jsonString;
+        onClickButton(jsonData);
+    });
+
+    const slider = document.getElementById('mySlider');
+    const output = document.getElementById('sliderValue');
+
+    slider.addEventListener('input', function() {
+      output.innerText = slider.value;
+      onSliderChanged(slider.value)
+    });
+
+    // JavaScript code for defining the callback function
+    function onCallbackFromCpp(data) {
+        console.log('Callback from C++:');
+        
+        // Display an alert with the received data
+        alert('Callback from C++: ');
+        
+        // Do something with the data received from C++
+    }
+    
+    // Example of using the callback function
+    function simulateCppCallback() {
+        // Simulating a callback from C++ by calling the defined callback function
+        const dataFromCpp = 'Hello from C++!';
+        onCallbackFromCpp();
+    }
+
+    // simulateCppCallback();
+  </script>
+
+</body>
+</html>

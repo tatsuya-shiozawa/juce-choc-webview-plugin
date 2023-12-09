@@ -21,7 +21,12 @@ juce_add_plugin("${BaseTargetName}"
 juce_add_binary_data(WebViewBundleData
         HEADER_NAME "WebViewBundleData.h"
         NAMESPACE "WebView"
-        SOURCES WebView/view.html)
+        SOURCES
+                WebView/view_hello.html
+                WebView/view_webgl.html
+                WebView/view_threejs.html
+                WebView/view_vrm.html
+        )
 
 target_sources(${BaseTargetName} PRIVATE
         Source/PluginProcessor.cpp

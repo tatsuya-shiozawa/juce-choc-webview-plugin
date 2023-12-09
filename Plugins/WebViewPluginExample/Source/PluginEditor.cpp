@@ -8,7 +8,9 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
 {
     juce::ignoreUnused (processorRef);
 
-    chocWebView = std::make_unique<choc::ui::WebView>();
+    choc::ui::WebView::Options options;
+    options.enableDebugMode = true;
+    chocWebView = std::make_unique<choc::ui::WebView>(options);
     
     juceHwndView = std::make_unique<juce::HWNDComponent>();
     juceHwndView->setHWND(chocWebView->getViewHandle());
@@ -16,13 +18,20 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
 
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (400, 300);
+    setSize (800, 600);
     setResizable(true, true);
 
     //chocWebView->navigate("http://www.google.com");
 
-    auto web_view_function_hello_cpp =
+    auto web_view_on_click_button =
       [safe_this = juce::Component::SafePointer(this)](const choc::value::ValueView& args) -> choc::value::Value {
+
+      auto message = "web_view_on_click_button() called with args: " + choc::json::toString(args);
+      juce::Logger::outputDebugString(choc::json::toString(args));
+
+      auto json = juce::JSON::parse(choc::json::toString(args));
+      juce::Logger::outputDebugString(juce::JSON::toString(json));
+
       if (safe_this.getComponent() == nullptr)
       {
         return choc::value::Value(-1);
@@ -30,15 +39,35 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
 
       juce::AlertWindow::showMessageBoxAsync(
         juce::MessageBoxIconType::WarningIcon,
-        "Hello from WebView!!!", "This dialog triggered by web view!!!");
+        "onClickButton is called from WebView!!!", message);
 
       return choc::value::Value(0);
     };
 
-    chocWebView->bind("hello_cpp", web_view_function_hello_cpp);
+    auto web_view_on_sliider_changed =
+      [safe_this = juce::Component::SafePointer(this)](const choc::value::ValueView& args) -> choc::value::Value {
 
-    const auto html = juce::String::createStringFromData(WebView::view_html, WebView::view_htmlSize);
+      auto message = "web_view_on_sliider_changed() called with args: " + choc::json::toString(args);
+      juce::Logger::outputDebugString(choc::json::toString(args));
+
+      auto json = juce::JSON::parse(choc::json::toString(args));
+      juce::Logger::outputDebugString(juce::JSON::toString(json));
+
+      if (safe_this.getComponent() == nullptr)
+      {
+        return choc::value::Value(-1);
+      }
+
+      return choc::value::Value(0);
+      };
+
+    chocWebView->bind("onClickButton", web_view_on_click_button);
+    chocWebView->bind("onSliderChanged", web_view_on_sliider_changed);
+
+    const auto html = juce::String::createStringFromData(WebView::view_hello_html, WebView::view_hello_htmlSize);
     chocWebView->setHTML(html.toStdString());
+
+
 }
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
@@ -62,4 +91,9 @@ void AudioPluginAudioProcessorEditor::resized()
     // subcomponents in your editor..
 
   juceHwndView->setBounds(getLocalBounds());
+
+  juce::MessageManager::callAsync([safe_this = juce::Component::SafePointer(this)]() {
+    safe_this->chocWebView->evaluateJavascript("onCallbackFromCpp()");
+    }
+  );
 }
