@@ -23,6 +23,9 @@
   <button id="myButton_simple">Send simple messge!</button>
   <button id="myButton_json">Send json object!</button>
 
+  <!-- HTML element to display the message -->
+  <label id="outputLabel">Message will appear here</label>
+
   <p>Slider Value: <span id="sliderValue">50</span></p>
   <input type="range" min="0" max="100" value="50" id="mySlider">
 
@@ -58,24 +61,27 @@
       onSliderChanged(slider.value)
     });
 
-    // JavaScript code for defining the callback function
-    function onCallbackFromCpp(data) {
-        console.log('Callback from C++:');
-        
-        // Display an alert with the received data
-        alert('Callback from C++: ');
-        
-        // Do something with the data received from C++
-    }
-    
-    // Example of using the callback function
-    function simulateCppCallback() {
-        // Simulating a callback from C++ by calling the defined callback function
-        const dataFromCpp = 'Hello from C++!';
-        onCallbackFromCpp();
+    // JavaScript code defining the Hello function
+    function Hello() {
+      // This is the function that will be called from C++
+      console.log('Hello from JavaScript!');
+      
+      // You can perform other actions or return data as needed
     }
 
-    // simulateCppCallback();
+    // JavaScript code defining the Hello function
+    function HelloWithJson(jsonData) {
+      // This is the function that will be called from C++
+      console.log('HelloWithJson: ', jsonData);
+      
+      // Access the 'message' property in the JSON data
+      var message = jsonData.message;
+
+      // Update the HTML label with the message
+      document.getElementById('outputLabel').innerText = 'Message from C++: ' + message;
+
+      // You can perform other actions or return data as needed
+    }
   </script>
 
 </body>

@@ -66,8 +66,6 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
 
     const auto html = juce::String::createStringFromData(WebView::view_hello_html, WebView::view_hello_htmlSize);
     chocWebView->setHTML(html.toStdString());
-
-
 }
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
@@ -93,7 +91,22 @@ void AudioPluginAudioProcessorEditor::resized()
   juceHwndView->setBounds(getLocalBounds());
 
   juce::MessageManager::callAsync([safe_this = juce::Component::SafePointer(this)]() {
-    safe_this->chocWebView->evaluateJavascript("onCallbackFromCpp()");
+    
+    {
+      safe_this->chocWebView->evaluateJavascript("Hello()");
+    }
+
+    {
+      juce::DynamicObject::Ptr json = new juce::DynamicObject();
+      json->setProperty("message", "hello from cpp");
+      const auto json_string = juce::JSON::toString(json.get());
+
+      juce::String javascript = juce::String("HelloWithJson(") << json_string.toStdString() << ")";
+
+      juce::Logger::outputDebugString(juce::JSON::toString(javascript));
+
+      safe_this->chocWebView->evaluateJavascript(javascript.toStdString());
+    }
     }
   );
 }
